@@ -12,7 +12,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
-public class WavIO {
+public class WAVIO {
 
 	protected static int FREQUENCY = 44100;
 	protected static int SAMPLE_SIZE = 8;
@@ -25,7 +25,7 @@ public class WavIO {
 	protected long length = 0;
 	protected int bitIndex = 0;
 	
-	public void file2Wav(String file, String wav) throws Exception {
+	public void file2WAV(String file, String wav) throws Exception {
 		wavOutput = new ByteArrayOutputStream();
 		
 		try (FileInputStream fileStream = new FileInputStream(new File(file))) {
@@ -151,16 +151,16 @@ public class WavIO {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		WavIO file2Wav = new WavIO();
+		WAVIO wavIO = new WAVIO();
 		
 		String action = args[0];
 		String source = args[1];
 		String target = args[2];
 				
 		if (FILE2WAV.equals(action)) {
-			file2Wav.file2Wav(source, target);
+			wavIO.file2WAV(source, target);
 		} else if(WAV2FILE.equals(action)) {
-			file2Wav.wav2File(source, target);
+			wavIO.wav2File(source, target);
 		} else {
 			System.out.println("Invalid action: " + action);
 		}
