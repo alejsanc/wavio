@@ -25,8 +25,6 @@ public class WavIO {
 	protected long length = 0;
 	protected int bitIndex = 0;
 	
-	
-	
 	public void file2Wav(String file, String wav) throws Exception {
 		wavOutput = new ByteArrayOutputStream();
 		
