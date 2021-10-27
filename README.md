@@ -1,2 +1,2 @@
-# wavio
-File to Wav and Wav to File
+# WAV I/O
+File to WAV and WAV to File
