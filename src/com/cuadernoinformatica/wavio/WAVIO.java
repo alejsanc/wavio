@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Alejandro Sánchez <web@cuadernoinformatica.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.cuadernoinformatica.wavio;
 
 import java.io.ByteArrayInputStream;
@@ -17,6 +33,7 @@ public class WAVIO {
 	protected static int FREQUENCY = 44100;
 	protected static int SAMPLE_SIZE = 8;
 	protected static int CHANNELS = 1;
+	protected static boolean SIGNED = false;
 	
 	protected static String FILE2WAV = "file2wav";
 	protected static String WAV2FILE = "wav2file";
@@ -42,82 +59,82 @@ public class WAVIO {
 		
 		wavOutput.flush();
 		ByteArrayInputStream input = new ByteArrayInputStream(wavOutput.toByteArray());
-		AudioFormat format = new AudioFormat(FREQUENCY, SAMPLE_SIZE, CHANNELS, false, true);
+		AudioFormat format = new AudioFormat(FREQUENCY, SAMPLE_SIZE, CHANNELS, SIGNED, true);
 		AudioInputStream audio = new AudioInputStream(input, format, length);
 		AudioSystem.write(audio, AudioFileFormat.Type.WAVE, new File(wav));
 	}	
 	
 	public void wav2File(String wav, String file) throws Exception {
 		AudioInputStream audio = AudioSystem.getAudioInputStream(new File(wav));
-		FileOutputStream output = new FileOutputStream(file);
-		BitSet bits = new BitSet();
-																
-		int wavByte;	
-		int samples = 0;
-		int position = 0;
 		
-		while (true) {
-					
-			wavByte = audio.read();
+		try(FileOutputStream output = new FileOutputStream(file)) {
+			BitSet bits = new BitSet();
+																	
+			int wavByte;	
+			int samples = 0;
+			int position = 0;
 			
-			if (position == 0) {
+			while (true) {
+						
+				wavByte = audio.read();
 				
-				if (wavByte > 200) {
-					
-					position = 1;
-					samples++;
-				}
-				
-			} else {
-				
-				if (position == 1) {
+				if (position == 0) {
 					
 					if (wavByte > 200) {
 						
-						samples++;
-						
-					} else if (wavByte < 56) {
-						
-						position = -1;
+						position = 1;
 						samples++;
 					}
 					
 				} else {
 					
-					if (wavByte > 200 || wavByte == -1) {
+					if (position == 1) {
 						
-						if (samples > 30) {
+						if (wavByte > 200) {
 							
-							bits.set(bitIndex, false);
-							bitIndex++;
+							samples++;
 							
-						} else {
+						} else if (wavByte < 56) {
 							
-							bits.set(bitIndex, true);
-							bitIndex++;
+							position = -1;
+							samples++;
 						}
 						
-						position = 1;
-						samples = 1;
+					} else {
 						
-					} else if (wavByte < 56) {
-						
-						samples++;
+						if (wavByte > 200 || wavByte == -1) {
+							
+							if (samples > 30) {
+								
+								bits.set(bitIndex, false);
+								bitIndex++;
+								
+							} else {
+								
+								bits.set(bitIndex, true);
+								bitIndex++;
+							}
+							
+							position = 1;
+							samples = 1;
+							
+						} else if (wavByte < 56) {
+							
+							samples++;
+						}
 					}
+				}
+				
+				if (wavByte == -1) {
+					break;
 				}
 			}
 			
-			if (wavByte == -1) {
-				break;
-			}
+			byte[] bytes = bits.toByteArray();
+			int trailingZeros = bitIndex/8 - bytes.length;
+			output.write(bytes);
+			output.write(new byte[trailingZeros]);
 		}
-		
-		byte[] bytes = bits.toByteArray();
-		int trailingZeros = bitIndex/8 - bytes.length;
-		output.write(bytes);
-		output.write(new byte[trailingZeros]);
-		output.flush();
-		output.close();
 	}
 	
 	public void writeByte(int input) throws Exception {
