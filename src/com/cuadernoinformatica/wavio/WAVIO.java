@@ -53,7 +53,7 @@ public class WAVIO {
 		}
 		
 		for (int x = 0; x < FREQUENCY; x++) {
-			wavOutput.write(127);
+			wavOutput.write(128);
 			length++;
 		}
 		
