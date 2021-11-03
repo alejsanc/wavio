@@ -5,6 +5,7 @@ File -> WAV File -> Audio Casette
 
 Audio Cassette -> WAV File -> File
 
+<img src="https://media.cuadernoinformatica.com/imagenes/grabacion-de-archivos-en-casetes/archivo-wav-linea-audio.jpg" />
 
 Usage:
 
